@@ -14,6 +14,7 @@ on:
     branches: [ main ]
     paths:
       - 'BeijingUniversalCrawler.jar'
+      - '.github/workflows/crawler.yml'
   workflow_dispatch:
 
 jobs:
@@ -34,6 +35,8 @@ jobs:
         run: |
           cp ./BeijingUniversalCrawler.jar BUC.jar
           ls -al
+          git branch -a
+          git fetch
           git checkout data
           ls -al
           java -jar BUC.jar
