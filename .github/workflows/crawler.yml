@@ -17,10 +17,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  crawler:
     runs-on: ubuntu-latest
     concurrency:
-      group: build
+      group: crawler
       cancel-in-progress: true
 
     steps:
