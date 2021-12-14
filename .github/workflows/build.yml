@@ -41,9 +41,9 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew jar
-          java -jar .\build\libs\BeijingUniversalCrawler-1.0.jar
           la -al
-          cat .\data\2021\12\2021-12-14.json
+          java -jar ${{ github.workspace }}/build/libs/BeijingUniversalCrawler-1.0.jar
+          cat ${{ github.workspace }}/data/2021/12/2021-12-14.json
       - name: Artifact Build
         uses: actions/upload-artifact@v2
         with:
