@@ -41,7 +41,7 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew jar
-          la -al
+          ls -al
           java -jar ${{ github.workspace }}/build/libs/BeijingUniversalCrawler-1.0.jar
           cat ${{ github.workspace }}/data/2021/12/2021-12-14.json
       - name: Artifact Build
