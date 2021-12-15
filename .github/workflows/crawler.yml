@@ -34,11 +34,11 @@ jobs:
       - name: Run Crawler
         run: |
           git branch -a
-          git fetch origin/data
+          git fetch origin data
           git checkout data
           java -jar BeijingUniversalCrawler.jar
           git config --global user.email "ssiori@gmail.com"
           git config --global user.name "${{ github.actor }}"
           git add *.json
           git commit -m "crawler"
-          git push origin/data
+          git push origin data
