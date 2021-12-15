@@ -31,14 +31,17 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Run Crawler
+      - name: Crawler
         run: |
+          git config --global user.email "ssiori@gmail.com"
+          git config --global user.name "${{ github.actor }}"
           git branch -a
           git fetch origin data
           git checkout data
           java -jar BeijingUniversalCrawler.jar
-          git config --global user.email "ssiori@gmail.com"
-          git config --global user.name "${{ github.actor }}"
+      - name: Git
+        run: |
+          git diff
           git add *.json
           git status
           git commit -m "crawler"
