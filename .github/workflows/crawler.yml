@@ -41,7 +41,7 @@ jobs:
           java -jar BeijingUniversalCrawler.jar
       - name: Git
         run: |
-          git add all
           git status
+          git add .
           git commit -m "crawler"
           git push origin data
