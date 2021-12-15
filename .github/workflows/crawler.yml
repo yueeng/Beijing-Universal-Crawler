@@ -36,7 +36,7 @@ jobs:
           git config --global user.email "ssiori@gmail.com"
           git config --global user.name "${{ github.actor }}"
           git fetch origin data
-          git checkout data
+          git checkout -f data
           git branch -a
           java -jar BeijingUniversalCrawler.jar
       - name: Git
