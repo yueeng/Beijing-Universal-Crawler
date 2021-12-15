@@ -8,7 +8,6 @@ import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.io.path.Path
@@ -93,6 +92,7 @@ data class Position(
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
+        TimeZone.setDefault(TimeZone.getTimeZone("CTT"))
         val opts = Options().addOption("?", "help", false, "Help")
 //            .addOption("u", "url", true, "Universal Beijing api url")
             .addOption("r", "retry", true, "Retry times when error")
@@ -112,7 +112,7 @@ object Main {
             val json = response.body?.string() ?: continue
             val result = runCatching { gson.fromJson(json, Result::class.java) }.getOrNull() ?: continue
             if (result.ret != 0) continue
-            val now = LocalDateTime.now(ZoneId.of("+8"))
+            val now = LocalDateTime.now()
             val fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             val path = Path(".", "data", "${now.year}", "${now.monthValue}", "${fmt.format(now)}.json").toFile()
             val saved = runCatching { gson.fromJson(path.readText(), Save::class.java) }.getOrNull() ?: Save()
