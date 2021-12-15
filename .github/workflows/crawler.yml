@@ -39,7 +39,7 @@ jobs:
           java -jar BeijingUniversalCrawler.jar
           git config --global user.email "ssiori@gmail.com"
           git config --global user.name "${{ github.actor }}"
-          git status
           git add *.json
+          git status
           git commit -m "crawler"
           git push origin data
