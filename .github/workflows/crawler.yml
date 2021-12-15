@@ -33,15 +33,12 @@ jobs:
           distribution: 'adopt'
       - name: Run Crawler
         run: |
-          cp ./BeijingUniversalCrawler.jar BUC.jar
-          ls -al
           git branch -a
-          git fetch
+          git fetch origin/data
           git checkout data
-          ls -al
-          java -jar BUC.jar
+          java -jar BeijingUniversalCrawler.jar
           git config --global user.email "ssiori@gmail.com"
           git config --global user.name "${{ github.actor }}"
           git add *.json
           git commit -m "crawler"
-          git push
+          git push origin/data

@@ -47,9 +47,10 @@ jobs:
           cp -f ./build/libs/BeijingUniversalCrawler-1.0.jar ./BeijingUniversalCrawler.jar
           git config --global user.email "ssiori@gmail.com"
           git config --global user.name "${{ github.actor }}"
+          git fetch origin/data
           git add ./BeijingUniversalCrawler.jar
           git commit -m "build jar"
-          git push
+          git push origin/data
       - name: Artifact Build
         uses: actions/upload-artifact@v2
         with:
