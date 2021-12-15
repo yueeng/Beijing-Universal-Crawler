@@ -35,14 +35,13 @@ jobs:
         run: |
           git config --global user.email "ssiori@gmail.com"
           git config --global user.name "${{ github.actor }}"
-          git branch -a
           git fetch origin data
           git checkout data
+          git branch -a
           java -jar BeijingUniversalCrawler.jar
       - name: Git
         run: |
-          git diff
-          git add *.json
+          git add all
           git status
           git commit -m "crawler"
           git push origin data
