@@ -48,6 +48,7 @@ jobs:
           git config --global user.email "ssiori@gmail.com"
           git config --global user.name "${{ github.actor }}"
           git fetch origin data
+          git checkout data
           git add ./BeijingUniversalCrawler.jar
           git commit -m "build jar"
           git push origin data
