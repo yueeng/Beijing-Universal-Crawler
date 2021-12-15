@@ -7,6 +7,7 @@ import okhttp3.Request
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
+import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -92,15 +93,16 @@ data class Position(
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        TimeZone.setDefault(TimeZone.getTimeZone("CTT"))
         val opts = Options().addOption("?", "help", false, "Help")
-//            .addOption("u", "url", true, "Universal Beijing api url")
+            .addOption("z", "zone", true, "Time Zone, default: CTT")
             .addOption("r", "retry", true, "Retry times when error")
         val cmd = DefaultParser().parse(opts, args)
         if (cmd.hasOption("?")) {
             HelpFormatter().printHelp("unlock", opts)
             return
         }
+        val zone = (if (cmd.hasOption("z")) cmd.getOptionValue("z") else null) ?: "CTT"
+        TimeZone.setDefault(TimeZone.getTimeZone(zone))
         val retry = (if (cmd.hasOption("r")) cmd.getOptionValue("r").toIntOrNull() else null) ?: 3
         val gson = GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd HH:mm:ssZ")
             .enableComplexMapKeySerialization().create()
@@ -119,8 +121,17 @@ object Main {
             saved[Date()] = result.data.list
             if (path.parentFile.isFile) path.parentFile.delete()
             if (!path.parentFile.exists()) path.parentFile.mkdirs()
-            runCatching { path.writeText(gson.toJson(saved)) }.onSuccess { exitProcess(0) }.onFailure { println(it.message) }
-            break
+            runCatching { path.writeText(gson.toJson(saved)) }.onFailure {
+                println(it.message)
+                exitProcess(2)
+            }
+            val files = Path(".", "data").toFile().walk()
+                .filter { it.isFile }
+                .filter { it.extension == "json" }
+                .map { it.name }
+                .toList()
+            runCatching { File(".", "files.json").writeText(gson.toJson(files)) }
+            exitProcess(0)
         }
         exitProcess(1)
     }
