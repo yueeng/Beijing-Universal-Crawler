@@ -39,9 +39,10 @@ jobs:
           git checkout -f data
           git branch -a
           java -jar BeijingUniversalCrawler.jar
+          ls -al
       - name: Git
         run: |
           git status
-          git add **/*.json
+          git add **.json
           git commit -m "crawler"
           git push origin data
