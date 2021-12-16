@@ -43,6 +43,6 @@ jobs:
       - name: Git
         run: |
           git status
-          git add **.json
+          git add .
           git commit -m "crawler"
           git push origin data
