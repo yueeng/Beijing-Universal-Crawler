@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="app">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/angular@1.8.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
     <script>
-        $(function () {
-        });
-
+        // 基于准备好的dom，初始化echarts实例
         function show(file) {
             const path = file.split('-');
             fetch('./data/' + path[0] + '/' + path[1] + '/' + file).then(function (response) {
@@ -39,9 +40,6 @@
                     })
                 }
                 console.info(datasets);
-
-                // 基于准备好的dom，初始化echarts实例
-                var myChart = echarts.init(document.getElementById('charts'));
 
                 // 指定图表的配置项和数据
                 var option = {
@@ -78,14 +76,49 @@
         }).catch(function (err) {
             console.info(err);
         });
+        angular.module('app', [])
+            .controller('BUC', function ($scope) {
+                $scope.files = [];
+                fetch('./files.json').then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                    for (const i in data) {
+                        $scope.$evalAsync(function(){
+                            $scope.files.push(data[i]);
+                        })
+                    }
+                }).catch(function (err) {
+                    console.info(err);
+                });
+                $scope.click = function (args) {
+                    console.info(this, args);
+                    show(args);
+                };
+            });
     </script>
 </head>
 <body>
-<div>
-    <ul id="list"></ul>
-    <div id="charts" style="width: 100%;height:400px;"></div>
+<div class="page-header">
+    <h1>BJU</h1>
 </div>
-<script>
-</script>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <div ng-controller="BUC" class="card shadow">
+                <ul class="list-unstyled">
+                    <li ng-repeat="file in files" ng-click="click(file)">
+                        {{ file }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div id="charts" style="width: 100%;height:600px;"></div>
+            <script>
+                var myChart = echarts.init(document.getElementById('charts'));
+            </script>
+        </div>
+    </div>
+</div>
 </body>
 </html>
