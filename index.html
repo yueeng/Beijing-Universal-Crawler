@@ -73,18 +73,6 @@
             });
         }
 
-        fetch('./files.json').then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            for (const i in data) {
-                const a = $('<a/>').text(data[i]).on('click', function () {
-                    show($(this).text());
-                });
-                $('<li/>').append(a).appendTo('#list');
-            }
-        }).catch(function (err) {
-            console.info(err);
-        });
         angular.module('app', [])
             .controller('BUC', function ($scope) {
                 $scope.files = [];
