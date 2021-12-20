@@ -15,16 +15,11 @@
             fetch('./data/' + path[0] + '/' + path[1] + '/' + file).then(function (response) {
                 return response.json();
             }).then(function (data) {
-                var min = 0;
-                var max = Number.MAX_VALUE;
                 let chart = {};
                 for (const i in data) {
                     for (const j in data[i]) {
                         if (chart[data[i][j]['title']] == null) chart[data[i][j]['title']] = [];
-                        const time = Date.parse(i) / 1000;
-                        if (min < time) min = time;
-                        if (max > time) max = time;
-                        chart[data[i][j]['title']].push([time, data[i][j]["waiting_time"]])
+                        chart[data[i][j]['title']].push([i, data[i][j]["waiting_time"]])
                     }
                 }
                 console.info(chart);
@@ -50,8 +45,7 @@
                         data: legend
                     },
                     xAxis: {
-                        min: min,
-                        max: max
+                        type: 'time',
                     },
                     yAxis: {},
                     series: datasets
