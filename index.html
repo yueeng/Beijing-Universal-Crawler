@@ -78,7 +78,7 @@
                 }).then(function (data) {
                     for (const i in data) {
                         $scope.$evalAsync(function(){
-                            $scope.files.push(data[i]);
+                            $scope.files.push(data[i].split('.')[0]);
                         })
                     }
                 }).catch(function (err) {
@@ -86,7 +86,7 @@
                 });
                 $scope.click = function (args) {
                     console.info(this, args);
-                    show(args);
+                    show(args+'.json');
                 };
             });
     </script>
