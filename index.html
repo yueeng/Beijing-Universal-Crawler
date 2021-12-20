@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
     <script>
         // 基于准备好的dom，初始化echarts实例
-        function show(file) {
+        function show(file, call) {
             const path = file.split('-');
             fetch('./data/' + path[0] + '/' + path[1] + '/' + file).then(function (response) {
                 return response.json();
@@ -30,7 +30,6 @@
                         chart[data[i][j]['title']].push([i, data[i][j]["waiting_time"]])
                     }
                 }
-                console.info(chart);
                 let datasets = [];
                 let legend = [];
                 for (const i in chart) {
@@ -42,29 +41,33 @@
                         smooth: true,
                     })
                 }
-                console.info(datasets);
 
-                // 指定图表的配置项和数据
-                var option = {
-                    tooltip: {
-                        trigger: 'axis'
-                    },
-                    legend: {
-                        type: 'scroll',
-                        // orient: 'vertical',
-                        data: legend
-                    },
-                    xAxis: {
-                        type: 'time',
-                    },
-                    yAxis: {
-                        min: 0
-                    },
-                    series: datasets
-                };
+                function option(legend, datasets) {
+                    return {
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        legend: {
+                            type: 'scroll',
+                            // orient: 'vertical',
+                            data: legend
+                        },
+                        xAxis: {
+                            type: 'time',
+                        },
+                        yAxis: {
+                            min: 0
+                        },
+                        series: datasets
+                    };
+                }
 
                 // 使用刚指定的配置项和数据显示图表。
-                myChart.setOption(option);
+                let options = [option(legend, datasets)];
+                for (let i = 0; i < datasets.length; i++) {
+                    options.push(option([legend[i]], [datasets[i]]));
+                }
+                call(options);
             }).catch(function (err) {
                 console.info(err);
             });
@@ -85,6 +88,7 @@
         angular.module('app', [])
             .controller('BUC', function ($scope) {
                 $scope.files = [];
+                $scope.charts = [];
                 fetch('./files.json').then(function (response) {
                     return response.json();
                 }).then(function (data) {
@@ -97,9 +101,20 @@
                     console.info(err);
                 });
                 $scope.click = function (args) {
-                    console.info(this, args);
-                    show(args + '.json');
+                    $scope.charts = [];
+                    show(args + '.json', function (op) {
+                        $scope.$evalAsync(function () {
+                            $scope.charts = op;
+                        })
+                    });
                 };
+            })
+            .directive('repeatDone', function () {
+                return function (scope, element, attrs) {
+                    let chart = $('.chart', element);
+                    let echart = echarts.init(chart[0]);
+                    echart.setOption(scope.chart);
+                }
             });
     </script>
 </head>
@@ -108,9 +123,9 @@
     <div class="row">
         <h1>北京环球影城 - 等候时间</h1>
     </div>
-    <div class="row">
+    <div class="row" ng-controller="BUC">
         <div class="col-auto">
-            <div ng-controller="BUC" class="card shadow">
+            <div class="card shadow">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item" ng-repeat="file in files" ng-click="click(file)">
                         {{ file }}
@@ -119,10 +134,9 @@
             </div>
         </div>
         <div class="col-md-7">
-            <div id="charts" style="width: 100%;height:600px;"></div>
-            <script>
-                var myChart = echarts.init(document.getElementById('charts'));
-            </script>
+            <div class="row" ng-repeat="chart in charts track by $index" repeat-done>
+                <div class="chart" style="width: 100%;height:600px;"></div>
+            </div>
         </div>
     </div>
 </div>
