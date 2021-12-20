@@ -129,6 +129,7 @@ object Main {
                 .filter { it.isFile }
                 .filter { it.extension == "json" }
                 .map { it.name }
+                .sortedDescending()
                 .toList()
             runCatching { File(".", "files.json").writeText(gson.toJson(files)) }
             exitProcess(0)
