@@ -92,9 +92,12 @@
                 fetch('./files.json').then(function (response) {
                     return response.json();
                 }).then(function (data) {
+                    let names = [];
                     for (const i in data) {
+                        names.push(data[i].split('.')[0]);
                         $scope.$evalAsync(function () {
-                            $scope.files.push(data[i].split('.')[0]);
+                            $scope.files = names;
+                            $scope.click(names[0]);
                         })
                     }
                 }).catch(function (err) {
