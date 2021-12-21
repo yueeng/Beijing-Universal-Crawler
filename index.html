@@ -20,9 +20,7 @@
         // 基于准备好的dom，初始化echarts实例
         function show(file, call) {
             const path = file.split('-');
-            fetch('./data/' + path[0] + '/' + path[1] + '/' + file).then(function (response) {
-                return response.json();
-            }).then(function (data) {
+            fetch('./data/' + path[0] + '/' + path[1] + '/' + file).then(response => response.json()).then(data => {
                 let chart = {};
                 for (const i in data) {
                     for (const j in data[i]) {
@@ -56,54 +54,31 @@
                     options.push(option([legend[i]], [datasets[i]]));
                 }
                 call(options);
-            }).catch(function (err) {
-                console.info(err);
-            });
+            }).catch(err => console.info(err));
         }
 
-        angular.module('app', [])
-            .controller('BUC', function ($scope) {
-                $scope.files = [];
-                $scope.current = null;
+        angular.module('app', []).controller('BUC', $scope => {
+            $scope.files = [];
+            $scope.charts = [];
+            $scope.current = null;
+            fetch('./files.json').then(response => response.json()).then(data => {
+                const names = data.map(i => i.split('.')[0]);
+                $scope.$evalAsync(() => {
+                    $scope.files = names;
+                    $scope.click(names[0]);
+                })
+            }).catch(err => console.info(err));
+            $scope.click = args => {
+                $scope.current = args;
                 $scope.charts = [];
-                fetch('./files.json').then(function (response) {
-                    return response.json();
-                }).then(function (data) {
-                    let names = [];
-                    for (const i in data) {
-                        names.push(data[i].split('.')[0]);
-                    }
-                    $scope.$evalAsync(function () {
-                        $scope.files = names;
-                        $scope.click(names[0]);
-                    })
-                }).catch(function (err) {
-                    console.info(err);
-                });
-                $scope.click = function (args) {
-                    $scope.current = args;
-                    $scope.charts = [];
-                    show(args + '.json', function (op) {
-                        $scope.$evalAsync(function () {
-                            $scope.charts = op;
-                        })
-                    });
-                };
-            })
-            .directive('repeatDone', function () {
-                return function (scope, element, attrs) {
-                    let chart = $('.chart', element);
-                    let echart = echarts.init(chart[0]);
-                    echart.setOption(scope.chart);
-                }
-            });
-        $(window).resize(function () {
-            console.info('resize');
-            const charts = $('.chart');
-            for (let i = 0; i < charts.length; i++) {
-                echarts.getInstanceByDom(charts[i]).resize();
-            }
+                show(args + '.json', op => $scope.$evalAsync(() => $scope.charts = op));
+            };
+        }).directive('repeatDone', () => (scope, element) => {
+            const chart = $('.chart', element);
+            const echart = echarts.init(chart[0]);
+            echart.setOption(scope.chart);
         });
+        $(window).resize(() => $('.chart').toArray().map(i => echarts.getInstanceByDom(i)).forEach(i => i.resize()));
     </script>
 </head>
 <body>
