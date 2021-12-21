@@ -97,6 +97,13 @@
                     echart.setOption(scope.chart);
                 }
             });
+        $(window).resize(function () {
+            console.info('resize');
+            const charts = $('.chart');
+            for (let i = 0; i < charts.length; i++) {
+                echarts.getInstanceByDom(charts[i]).resize();
+            }
+        });
     </script>
 </head>
 <body>
