@@ -42,25 +42,13 @@
                     })
                 }
 
-                function option(legend, datasets) {
-                    return {
-                        tooltip: {
-                            trigger: 'axis'
-                        },
-                        legend: {
-                            type: 'scroll',
-                            // orient: 'vertical',
-                            data: legend
-                        },
-                        xAxis: {
-                            type: 'time',
-                        },
-                        yAxis: {
-                            min: 0
-                        },
-                        series: datasets
-                    };
-                }
+                const option = (legend, datasets) => ({
+                    tooltip: {trigger: 'axis'},
+                    legend: {type: 'scroll', data: legend},
+                    xAxis: {type: 'time',},
+                    yAxis: {min: 0},
+                    series: datasets
+                });
 
                 // 使用刚指定的配置项和数据显示图表。
                 let options = [option(legend, datasets)];
@@ -76,6 +64,7 @@
         angular.module('app', [])
             .controller('BUC', function ($scope) {
                 $scope.files = [];
+                $scope.current = null;
                 $scope.charts = [];
                 fetch('./files.json').then(function (response) {
                     return response.json();
@@ -83,15 +72,16 @@
                     let names = [];
                     for (const i in data) {
                         names.push(data[i].split('.')[0]);
-                        $scope.$evalAsync(function () {
-                            $scope.files = names;
-                            $scope.click(names[0]);
-                        })
                     }
+                    $scope.$evalAsync(function () {
+                        $scope.files = names;
+                        $scope.click(names[0]);
+                    })
                 }).catch(function (err) {
                     console.info(err);
                 });
                 $scope.click = function (args) {
+                    $scope.current = args;
                     $scope.charts = [];
                     show(args + '.json', function (op) {
                         $scope.$evalAsync(function () {
@@ -118,14 +108,14 @@
         <div class="col-auto">
             <div class="card shadow">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item" ng-repeat="file in files" ng-click="click(file)">
+                    <li class="list-group-item" ng-repeat="file in files" ng-click="click(file)" ng-class="{active:current==file}">
                         {{ file }}
                     </li>
                 </ul>
             </div>
         </div>
         <div class="col-md-7">
-            <div class="row" ng-repeat="chart in charts track by $index" repeat-done>
+            <div class="row" ng-repeat="chart in charts" repeat-done>
                 <div class="chart" style="width: 100%;height:600px;"></div>
             </div>
         </div>
