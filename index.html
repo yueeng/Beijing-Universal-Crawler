@@ -18,7 +18,23 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
     <script>
         // 基于准备好的dom，初始化echarts实例
-        function show(file, call) {
+        const chart_option = (legend, datasets) => ({
+            tooltip: {
+                trigger: 'axis',
+                position: (pos, params, dom, rect, size) => {
+                    let obj = {top: 60};
+                    obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
+                    return obj;
+                },
+                axisPointer: {type: 'cross'}
+            },
+            legend: {type: 'scroll', data: legend},
+            xAxis: {type: 'time'},
+            yAxis: {min: 0},
+            series: datasets
+        });
+
+        const chart = (file, call) => {
             const path = file.split('-');
             fetch('./data/' + path[0] + '/' + path[1] + '/' + file).then(response => response.json()).then(data => {
                 let chart = {};
@@ -40,22 +56,14 @@
                     })
                 }
 
-                const option = (legend, datasets) => ({
-                    tooltip: {trigger: 'axis'},
-                    legend: {type: 'scroll', data: legend},
-                    xAxis: {type: 'time',},
-                    yAxis: {min: 0},
-                    series: datasets
-                });
-
                 // 使用刚指定的配置项和数据显示图表。
-                let options = [option(legend, datasets)];
+                let options = [chart_option(legend, datasets)];
                 for (let i = 0; i < datasets.length; i++) {
-                    options.push(option([legend[i]], [datasets[i]]));
+                    options.push(chart_option([legend[i]], [datasets[i]]));
                 }
                 call(options);
             }).catch(err => console.info(err));
-        }
+        };
 
         angular.module('app', []).controller('BUC', $scope => {
             $scope.files = [];
@@ -71,7 +79,7 @@
             $scope.click = args => {
                 $scope.current = args;
                 $scope.charts = [];
-                show(args + '.json', op => $scope.$evalAsync(() => $scope.charts = op));
+                chart(args + '.json', op => $scope.$evalAsync(() => $scope.charts = op));
             };
         }).directive('repeatDone', () => (scope, element) => {
             const chart = $('.chart', element);
