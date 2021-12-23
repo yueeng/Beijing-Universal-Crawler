@@ -9,7 +9,7 @@ name: Crawler
 
 on:
   schedule:
-    - cron: '0/5 0-14 * * *'
+    - cron: '0/10 0-14,22,23 * * *'
   push:
     branches: [ main, data ]
     paths:
