@@ -86,6 +86,9 @@
                 $scope.charts = [];
                 chart(args + '.json', op => $scope.$evalAsync(() => $scope.charts = op));
             };
+            $scope.week = date => {
+                return '星期' + '日一二三四五六'.charAt(new Date(date).getDay());
+            };
         }).directive('repeatDone', () => (scope, element) => {
             const chart = $('.chart', element);
             const echart = echarts.init(chart[0]);
@@ -112,7 +115,10 @@
                         <div id="flush-collapse-{{key}}" class="accordion-collapse collapse" ng-class="{show:key==current.substr(0,7)}" aria-labelledby="flush-heading-{{key}}" data-bs-parent="#accordionFiles">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item" ng-repeat="file in files" ng-click="click(file)" ng-class="{active:current==file}">
-                                    {{ file }}
+                                    <p class="m-0">{{ file }}</p>
+                                    <p class="m-0 small text-end text-black-50">
+                                        {{ week(file) }}
+                                    </p>
                                 </li>
                             </ul>
                         </div>
@@ -122,7 +128,7 @@
         </div>
         <div class="col">
             <div class="row" ng-repeat="chart in charts" repeat-done>
-                <div class="chart" style="width:99%;height:600px;"></div>
+                <div class="chart" style="width:98%;height:600px;"></div>
             </div>
         </div>
     </div>
