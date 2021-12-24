@@ -86,9 +86,7 @@
                 $scope.charts = [];
                 chart(args + '.json', op => $scope.$evalAsync(() => $scope.charts = op));
             };
-            $scope.week = date => {
-                return '星期' + '日一二三四五六'.charAt(new Date(date).getDay());
-            };
+            $scope.week = date => '星期' + '日一二三四五六'.charAt(new Date(date).getDay());
         }).directive('repeatDone', () => (scope, element) => {
             const chart = $('.chart', element);
             const echart = echarts.init(chart[0]);
