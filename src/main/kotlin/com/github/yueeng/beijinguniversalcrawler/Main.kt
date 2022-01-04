@@ -116,7 +116,7 @@ object Main {
             if (result.ret != 0) continue
             val now = LocalDateTime.now()
             val fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val path = Path(".", "data", "${now.year}", "${now.monthValue}", "${fmt.format(now)}.json").toFile()
+            val path = Path(".", "data", "${now.year}", "%02d".format(now.monthValue), "${fmt.format(now)}.json").toFile()
             val saved = runCatching { gson.fromJson(path.readText(), Save::class.java) }.getOrNull() ?: Save()
             saved[Date()] = result.data.list
             if (path.parentFile.isFile) path.parentFile.delete()
