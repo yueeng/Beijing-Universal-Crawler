@@ -111,10 +111,16 @@ object Main {
             val url = "https://gw.app.universalbeijingresort.com/attraction/list"
             for (i in 1..retry) {
                 val response = okhttp.newCall(Request.Builder().url(url).build()).execute()
-                if (response.code != 200) continue
+                if (response.code != 200) {
+                    println("${response.code}: ${response.message}")
+                    continue
+                }
                 val json = response.body?.string() ?: continue
-                val result = runCatching { gson.fromJson(json, Result::class.java) }.getOrNull() ?: continue
-                if (result.ret != 0) continue
+                val result = runCatching { gson.fromJson(json, Result::class.java) }.onFailure { println(it.message) }.getOrNull() ?: continue
+                if (result.ret != 0) {
+                    println("result.ret: ${result.ret}")
+                    continue
+                }
                 val now = LocalDateTime.now()
                 val fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                 val path = Path(".", "data", "${now.year}", "%02d".format(now.monthValue), "${fmt.format(now)}.json").toFile()
