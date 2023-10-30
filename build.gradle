@@ -17,6 +17,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
 }
 
+application {
+    mainClass = 'com.github.yueeng.beijinguniversalcrawler.Main' 
+}
+
 jar {
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     manifest.attributes.put('Main-Class', 'com.github.yueeng.beijinguniversalcrawler.Main')

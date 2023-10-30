@@ -93,46 +93,52 @@ data class Position(
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        val opts = Options().addOption("?", "help", false, "Help")
-            .addOption("z", "zone", true, "Time Zone, default: CTT")
-            .addOption("r", "retry", true, "Retry times when error")
-        val cmd = DefaultParser().parse(opts, args)
-        if (cmd.hasOption("?")) {
-            HelpFormatter().printHelp("unlock", opts)
-            return
-        }
-        val zone = (if (cmd.hasOption("z")) cmd.getOptionValue("z") else null) ?: "CTT"
-        TimeZone.setDefault(TimeZone.getTimeZone(zone))
-        val retry = (if (cmd.hasOption("r")) cmd.getOptionValue("r").toIntOrNull() else null) ?: 3
-        val gson = GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd HH:mm:ssZ")
-            .enableComplexMapKeySerialization().create()
-        val okhttp = OkHttpClient.Builder().build()
-        val url = "https://gw.app.universalbeijingresort.com/attraction/list"
-        for (i in 1..retry) {
-            val response = okhttp.newCall(Request.Builder().url(url).build()).execute()
-            if (response.code != 200) continue
-            val json = response.body?.string() ?: continue
-            val result = runCatching { gson.fromJson(json, Result::class.java) }.getOrNull() ?: continue
-            if (result.ret != 0) continue
-            val now = LocalDateTime.now()
-            val fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val path = Path(".", "data", "${now.year}", "%02d".format(now.monthValue), "${fmt.format(now)}.json").toFile()
-            val saved = runCatching { gson.fromJson(path.readText(), Save::class.java) }.getOrNull() ?: Save()
-            saved[Date()] = result.data.list
-            if (path.parentFile.isFile) path.parentFile.delete()
-            if (!path.parentFile.exists()) path.parentFile.mkdirs()
-            runCatching { path.writeText(gson.toJson(saved)) }.onFailure {
-                println(it.message)
-                exitProcess(2)
+        try {
+            val opts = Options().addOption("?", "help", false, "Help")
+                .addOption("z", "zone", true, "Time Zone, default: CTT")
+                .addOption("r", "retry", true, "Retry times when error")
+            val cmd = DefaultParser().parse(opts, args)
+            if (cmd.hasOption("?")) {
+                HelpFormatter().printHelp("unlock", opts)
+                return
             }
-            val files = Path(".", "data").toFile().walk()
-                .filter { it.isFile }
-                .filter { it.extension == "json" }
-                .map { it.name }
-                .sortedDescending()
-                .toList()
-            runCatching { File(".", "files.json").writeText(gson.toJson(files)) }
-            exitProcess(0)
+            val zone = (if (cmd.hasOption("z")) cmd.getOptionValue("z") else null) ?: "CTT"
+            TimeZone.setDefault(TimeZone.getTimeZone(zone))
+            val retry = (if (cmd.hasOption("r")) cmd.getOptionValue("r").toIntOrNull() else null) ?: 3
+            val gson = GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd HH:mm:ssZ")
+                .enableComplexMapKeySerialization().create()
+            val okhttp = OkHttpClient.Builder().build()
+            val url = "https://gw.app.universalbeijingresort.com/attraction/list"
+            for (i in 1..retry) {
+                val response = okhttp.newCall(Request.Builder().url(url).build()).execute()
+                if (response.code != 200) continue
+                val json = response.body?.string() ?: continue
+                val result = runCatching { gson.fromJson(json, Result::class.java) }.getOrNull() ?: continue
+                if (result.ret != 0) continue
+                val now = LocalDateTime.now()
+                val fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                val path = Path(".", "data", "${now.year}", "%02d".format(now.monthValue), "${fmt.format(now)}.json").toFile()
+                val saved = runCatching { gson.fromJson(path.readText(), Save::class.java) }.getOrNull() ?: Save()
+                saved[Date()] = result.data.list
+                if (path.parentFile.isFile) path.parentFile.delete()
+                if (!path.parentFile.exists()) path.parentFile.mkdirs()
+                runCatching { path.writeText(gson.toJson(saved)) }.onFailure {
+                    println(it.message)
+                    exitProcess(2)
+                }
+                val files = Path(".", "data").toFile().walk()
+                    .filter { it.isFile }
+                    .filter { it.extension == "json" }
+                    .map { it.name }
+                    .sortedDescending()
+                    .toList()
+                runCatching { File(".", "files.json").writeText(gson.toJson(files)) }
+                exitProcess(0)
+            }
+            println("Retry failed")
+        }
+        catch (e: Exception) {
+            println(e.message)
         }
         exitProcess(1)
     }
