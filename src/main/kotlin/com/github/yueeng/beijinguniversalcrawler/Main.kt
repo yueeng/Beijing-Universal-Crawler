@@ -114,7 +114,7 @@ object Main {
                 var request = Request.Builder().url(url).header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36 Edg/118.0.2088.69").build()
                 val response = okhttp.newCall(request).execute()
                 if (response.code != 200) {
-                    println("${response.code}: ${response.message}")
+                    println("${response.code}: ${response.message}\n${response.body?.string()}")
                     continue
                 }
                 val json = response.body?.string() ?: continue
