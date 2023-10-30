@@ -120,7 +120,7 @@ object Main {
                 val json = response.body?.string() ?: continue
                 val result = runCatching { gson.fromJson(json, Result::class.java) }.onFailure { println(it.message) }.getOrNull() ?: continue
                 if (result.ret != 0) {
-                    println("result.ret: ${result.ret}")
+                    println("${result.ret}: {$result.msg}")
                     continue
                 }
                 val now = LocalDateTime.now()

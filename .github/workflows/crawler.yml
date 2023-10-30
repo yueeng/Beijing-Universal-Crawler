@@ -33,6 +33,7 @@ jobs:
           distribution: 'adopt'
       - name: Crawler
         run: |
+          curl "https://gw.app.universalbeijingresort.com/attraction/list"
           git config --global user.email "ssiori@gmail.com"
           git config --global user.name "${{ github.actor }}"
           git fetch origin data
