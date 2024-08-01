@@ -111,7 +111,7 @@ object Main {
             val url = "https://gw.app.universalbeijingresort.com/attraction/list"
             for (i in 1..retry) {
                 Thread.sleep(1000)
-                var request = Request.Builder().url(url).header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36 Edg/118.0.2088.69").build()
+                var request = Request.Builder().url(url).header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36 Edg/118.0.2088.69 WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64 MiniProgramEnv/android").build()
                 val response = okhttp.newCall(request).execute()
                 if (response.code != 200) {
                     println("${response.code}: ${response.message}\n${response.body?.string()}")
